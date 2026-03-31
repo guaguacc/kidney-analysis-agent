@@ -1,0 +1,2 @@
+class PatientModel:
+    pass

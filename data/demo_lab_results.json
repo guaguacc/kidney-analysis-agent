@@ -1,0 +1,11 @@
+[
+  {
+    "patient_id": "P001",
+    "scr": 145,
+    "egfr": 52,
+    "acr": 120,
+    "urine_protein": "positive",
+    "sbp": 148,
+    "dbp": 92
+  }
+]

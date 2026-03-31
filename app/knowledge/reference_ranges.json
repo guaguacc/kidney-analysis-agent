@@ -1,0 +1,5 @@
+{
+  "scr": {"unit": "umol/L", "upper": 110},
+  "egfr": {"unit": "mL/min/1.73m2", "lower": 60},
+  "acr": {"unit": "mg/g", "upper": 30}
+}

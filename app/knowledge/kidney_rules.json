@@ -1,0 +1,6 @@
+{
+  "rules": [
+    {"field": "egfr", "operator": "<", "value": 60, "message": "eGFR reduced"},
+    {"field": "acr", "operator": ">=", "value": 30, "message": "albuminuria risk"}
+  ]
+}
