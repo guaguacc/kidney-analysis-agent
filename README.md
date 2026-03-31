@@ -50,19 +50,6 @@
 
 适合当作一个“规则引擎 + 大模型 + API 服务”的完整后端 AI 项目展示。
 
-### 3.4 面试项目
-
-适合用于展示以下能力：
-
-- Python 后端开发
-- FastAPI 接口设计
-- OpenAI API 接入
-- 规则引擎设计
-- 多模块项目结构拆分
-- 面向医疗场景的 AI 应用落地
-
----
-
 ## 4. 当前已实现功能
 
 ### 4.1 单次指标分析
@@ -224,192 +211,9 @@ agent/
 └── README.md
 ```
 
----
+## 7. 当前接口设计
 
-## 7. 各模块说明
-
-## 7.1 `app/main.py`
-
-FastAPI 应用入口文件，负责：
-
-- 创建 `FastAPI` 实例
-- 注册各个路由
-- 启动整个后端服务
-
----
-
-## 7.2 `app/config.py`
-
-配置文件，负责读取环境变量，例如：
-
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL`
-- `APP_NAME`
-
-通常会从 `.env` 文件中读取。
-
----
-
-## 7.3 `app/api/routes/analyze.py`
-
-分析接口路由文件。
-
-主要负责：
-
-- 接收前端或测试脚本发来的分析请求
-- 将请求数据交给 `AgentService`
-- 返回最终分析结果
-
-对应接口：
-
-```http
-POST /analyze
-```
-
----
-
-## 7.4 `app/api/routes/history.py`
-
-历史记录与趋势分析接口。
-
-负责：
-
-- 查询某个患者的历史记录
-- 对该患者的历史指标做趋势分析
-
-对应接口：
-
-```http
-GET /history/{patient_id}
-GET /history/{patient_id}/trend
-```
-
----
-
-## 7.5 `app/api/routes/health.py`
-
-健康检查接口。
-
-用于快速判断服务是否正常运行。
-
-对应接口：
-
-```http
-GET /health
-```
-
----
-
-## 7.6 `app/services/agent_service.py`
-
-项目总调度层，也是项目的核心“大脑”。
-
-主要流程：
-
-1. 校验输入数据
-2. 调用规则引擎
-3. 构造 GPT prompt
-4. 调用 GPT API
-5. 合并规则分析结果和 GPT 输出
-6. 保存历史记录
-7. 返回最终 JSON
-
----
-
-## 7.7 `app/services/rule_engine.py`
-
-规则引擎模块。
-
-负责根据医学规则对指标进行初步判断，例如：
-
-- 血肌酐是否升高
-- eGFR 是否下降
-- ACR 是否异常
-- 血压是否升高
-- 是否提示蛋白尿风险
-
-同时输出：
-
-- `risk_level`
-- `ckd_stage`
-- `egfr_severity`
-- `abnormal_items`
-- `rule_based_summary`
-
----
-
-## 7.8 `app/services/gpt_service.py`
-
-模型调用模块。
-
-负责：
-
-- 初始化 OpenAI Client
-- 调用 GPT API
-- 获取模型返回结果
-- 解析 JSON
-- 将结果整理成统一字典结构
-
----
-
-## 7.9 `app/services/trend_service.py`
-
-趋势分析模块。
-
-负责比较同一患者不同时间点的指标变化，例如：
-
-- 第一条记录和最后一条记录对比
-- 指标是否上升 / 下降
-- 对应是改善还是恶化
-
----
-
-## 7.10 `app/repositories/history_repository.py`
-
-历史记录存储层。
-
-当前版本为**内存存储**，主要用于：
-
-- 保存单次分析后的记录
-- 根据 `patient_id` 查询同一患者历史数据
-
-后续可以升级为：
-
-- SQLite
-- MySQL
-- PostgreSQL
-
----
-
-## 7.11 `app/utils/validator.py`
-
-输入数据校验模块。
-
-负责：
-
-- 必填字段校验
-- 类型校验
-- 数值字段合法性判断
-- 性别字段值校验
-
----
-
-## 7.12 `app/core/prompts.py`
-
-Prompt 模板文件。
-
-负责构建给 GPT 的系统提示词和用户输入内容，控制模型：
-
-- 输出中文
-- 输出 JSON
-- 不要夸大结论
-- 不要做明确诊断
-
----
-
-## 8. 当前接口设计
-
-## 8.1 健康检查接口
+## 7.1 健康检查接口
 
 ```http
 GET /health
@@ -426,7 +230,7 @@ GET /health
 
 ---
 
-## 8.2 分析接口
+## 7.2 分析接口
 
 ```http
 POST /analyze
@@ -477,7 +281,7 @@ POST /analyze
 
 ---
 
-## 8.3 历史记录接口
+## 7.3 历史记录接口
 
 ```http
 GET /history/{patient_id}
@@ -489,7 +293,7 @@ GET /history/{patient_id}
 
 ---
 
-## 8.4 趋势分析接口
+## 7.4 趋势分析接口
 
 ```http
 GET /history/{patient_id}/trend
@@ -507,201 +311,11 @@ GET /history/{patient_id}/trend
 
 ---
 
-## 9. 当前输入字段说明
-
-支持的主要输入字段如下：
-
-| 字段名            | 类型          | 说明            |
-| ----------------- | ------------- | --------------- |
-| `patient_id`    | `str`       | 患者唯一标识    |
-| `age`           | `int`       | 年龄            |
-| `gender`        | `str`       | 性别            |
-| `scr`           | `float`     | 血肌酐          |
-| `bun`           | `float`     | 尿素氮          |
-| `egfr`          | `float`     | 肾小球滤过率    |
-| `acr`           | `float`     | 尿白蛋白/肌酐比 |
-| `urine_protein` | `str`       | 尿蛋白结果      |
-| `sbp`           | `float`     | 收缩压          |
-| `dbp`           | `float`     | 舒张压          |
-| `history`       | `list[str]` | 既往病史        |
-
----
-
-## 10. 风险判断逻辑概述
-
-当前项目中的规则判断是一个简化版原型，核心思路如下：
-
-### 10.1 Scr
-
-如果 `scr > 133`，提示：
-
-- 血肌酐升高
-
----
-
-### 10.2 eGFR
-
-根据 eGFR 判断：
-
-- 是否下降
-- CKD 分期
-- 严重程度
-- 风险等级
-
-参考逻辑：
-
-- `>= 90`：G1
-- `>= 60`：G2
-- `>= 45`：G3a
-- `>= 30`：G3b
-- `>= 15`：G4
-- `< 15`：G5
-
----
-
-### 10.3 ACR
-
-如果：
-
-- `ACR >= 30`：提示升高
-- `ACR >= 300`：提示重度升高
-
----
-
-### 10.4 血压
-
-如果：
-
-- `SBP >= 140`：收缩压升高
-- `DBP >= 90`：舒张压升高
-
----
-
-### 10.5 尿蛋白
-
-若结果为：
-
-- `positive`
-- `+`
-- `1+`
-- `2+`
-- `3+`
-
-则提示尿蛋白异常。
-
----
-
-## 11. 中文 GPT 输出说明
-
-系统通过 `prompts.py` 控制 GPT 输出，要求模型：
-
-- 使用中文
-- 输出严格 JSON
-- 不输出 markdown
-- 不做明确诊断
-- 输出谨慎、专业的解释
-
-返回字段包括：
-
-- `summary`
-- `explanation`
-- `recommendations`
-- `caution`
-
----
-
-## 12. 测试方式
-
-当前支持以下测试方式。
-
-## 12.1 Swagger 文档测试
-
-启动服务后，打开：
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-可以直接在页面里测试：
-
-- `POST /analyze`
-- `GET /history/{patient_id}`
-- `GET /history/{patient_id}/trend`
-
----
-
-## 12.2 Python 测试脚本
-
-可通过：
-
-```bash
-python tests/manual_api_test.py
-```
-
-对接口进行顺序测试。
-
-建议顺序：
-
-1. 第一次调用 `POST /analyze`
-2. 第二次调用 `POST /analyze`
-3. 查询 `GET /history/P001`
-4. 查询 `GET /history/P001/trend`
-
----
-
-## 12.3 `.http` 文件测试
-
-如果使用 VS Code + REST Client 插件，可在：
-
-```text
-tests/api_test.http
-```
-
-中编写请求进行测试。
-
----
-
-## 13. 启动说明
-
-## 13.1 安装依赖
-
-```bash
-pip install fastapi uvicorn openai python-dotenv requests
-```
-
----
-
-## 13.2 配置环境变量
-
-项目根目录创建 `.env` 文件：
-
-```env
-OPENAI_API_KEY=你的OpenAI_API_Key
-OPENAI_MODEL=gpt-5.4-mini
-APP_NAME=Kidney Agent
-```
-
----
-
-## 13.3 启动服务
-
-```bash
-uvicorn app.main:app --reload
-```
-
-启动成功后访问：
-
-```text
-http://127.0.0.1:8000/docs
-```
-
----
-
-## 14. 当前项目亮点
+## 8. 当前项目亮点
 
 这个项目的亮点主要在于：
 
-### 14.1 规则引擎 + 大模型结合
+### 8.1 规则引擎 + 大模型结合
 
 不是纯 GPT 生成，而是先经过规则引擎判断，再交给 GPT 做语言解释。
 
@@ -712,7 +326,7 @@ http://127.0.0.1:8000/docs
 
 ---
 
-### 14.2 结构化 + 自然语言双输出
+### 8.2 结构化 + 自然语言双输出
 
 系统既能输出结构化字段：
 
@@ -728,7 +342,7 @@ http://127.0.0.1:8000/docs
 
 ---
 
-### 14.3 医疗场景化
+### 8.3 医疗场景化
 
 项目不只是普通聊天，而是具体到：
 
@@ -737,19 +351,6 @@ http://127.0.0.1:8000/docs
 - 随访趋势判断
 
 更有行业场景感。
-
----
-
-### 14.4 可扩展性强
-
-当前虽然是原型，但后续非常容易继续扩展为正式系统，例如：
-
-- 接数据库
-- 接前端
-- 接 RAG 医学知识库
-- 支持批量分析
-- 增加图表展示
-- 接医生审核流程
 
 ---
 
